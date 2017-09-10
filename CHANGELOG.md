@@ -44,6 +44,9 @@ For more information also see:
   * `id_from_handle`: Return the `ID` associated with an HANDLE
   * `type_of_control`: Return the `ControlType` associated with a control
 
+* **Groupbox**
+  * Now implemented as a custom control. Fix flicking issue and black paddings.
+
 * **Most controls**
   * `set_font` and `get_font`: Allow the user to set the font or get the font identifier of many built-in controls  
   * `update`: Force a control to redraw itself.  
