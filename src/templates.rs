@@ -879,7 +879,7 @@ macro_rules! nwg_tabsview {
     (parent=$p:expr; $( $i:ident=$v:expr );* ) => { {
         let mut t = 
         $crate::TabViewT { 
-            position: (0, 0), size: (100, 30), 
+            position: (0, 0), size: (100, 100), 
             visible: true, disabled: false,
             parent: $p, font: None
         };
@@ -915,6 +915,38 @@ macro_rules! nwg_tab {
         t
     }}
 }
+
+/**
+    Sane defaults for the ListView control. Requires a parent.
+
+    Defaults:  
+    • position: `(0, 0)`  
+    • size: `(100, 100)`  
+    • visible: `true`  
+    • disabled: `false`  
+    • font: `None`
+
+    Usage:  
+    `nwg_listview!(parent="MyParent";)`  
+    `nwg_listview!(parent="MyParent"; visible=false; size=(10, 10))`  
+    `nwg_listview!(parent="MyParent"; \* Any combinations of the template properties*\)`    
+*/
+#[macro_export]
+macro_rules! nwg_listview {
+    (parent=$p:expr; $( $i:ident=$v:expr );* ) => { {
+        let mut t = 
+        $crate::TabViewT { 
+            position: (0, 0), size: (100, 100), 
+            visible: true, disabled: false,
+            parent: $p, font: None
+        };
+        
+        $( t.$i = $v; );*
+
+        t
+    }}
+}
+
 
 
 //---- Resources ----//

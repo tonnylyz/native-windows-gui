@@ -37,9 +37,10 @@ nwg_template!(
         ("Action4", nwg_menuitem!(parent="TestSubmenu3"; text="Disabled :("; disabled=true)),
         
         // Tabs
-        ("TabView", nwg_tabsview!(parent="MainWindow"; position=(5, 5); size=(490, 370))),
+        ("TabView", nwg_tabsview!(parent="MainWindow"; position=(5, 5); size=(490, 370); font=Some("Font1"))),
         ("Tab1", nwg_tab!(parent="TabView"; text="Simple controls")),
         ("Tab2", nwg_tab!(parent="TabView"; text="Images And Trees")),
+        ("Tab3", nwg_tab!(parent="TabView"; text="Listview")),
 
         // Timers
         ("TimerButton", nwg_button!(parent="Tab1"; text="Start timer"; position=(10,5); size=(100, 30); font=Some("Font2"))),
@@ -101,7 +102,10 @@ nwg_template!(
         ("TreeJob", nwg_treeview_item!(parent="TreeDirector"; text="Job Drake")),
         ("TreeManagement", nwg_treeview_item!(parent="Tree_Root"; text="Management")),
         ("TreeSally", nwg_treeview_item!(parent="TreeManagement"; text="Sally Foo")),
-        ("TreeTI", nwg_treeview_item!(parent="Tree_Root"; text="TI"))
+        ("TreeTI", nwg_treeview_item!(parent="Tree_Root"; text="TI")),
+
+        // Listview
+        ("ListView", nwg_listview!(parent="Tab3"; position=(5, 5); size=(280, 315); font=Some("Font1")))
     ];
     events: [
         ("RandomStuffTextBox", "AllSystemEvents", nwge::Any, |_,_,_,args| {
