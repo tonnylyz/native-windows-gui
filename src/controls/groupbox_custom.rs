@@ -44,11 +44,11 @@ pub struct GroupBoxT<ID: Hash+Clone, S: Clone+Into<String>> {
 impl<S: Clone+Into<String>, ID: Hash+Clone> ControlT<ID> for GroupBoxT<ID, S> {
     fn type_id(&self) -> TypeId { TypeId::of::<GroupBox>() }
 
-    fn build(&self, _: &Ui<ID>) -> Result<Box<Control>, Error> {
+    fn build(&self, ui: &Ui<ID>) -> Result<Box<Control>, Error> {
         unsafe{
             // Build the window handle
             if let Err(e) = build_sysclass() { return Err(e); }
-            match build_window(&self) {
+            match build_window(ui, &self) {
                 Ok(h) => { 
                     Ok( Box::new(GroupBox{handle: h}) as Box<Control> ) 
                 },
@@ -110,13 +110,24 @@ impl Control for GroupBox {
 
 #[allow(unused_variables)]
 unsafe extern "system" fn window_sysproc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-    use winapi::{WM_CREATE, WM_PAINT};
-    use user32::{DefWindowProcW};
+    use std::mem;
+    use winapi::{UINT, WM_CREATE, WM_PAINT, PAINTSTRUCT, RECT, COLOR_WINDOW};
+    use user32::{DefWindowProcW, DrawEdge, BeginPaint, EndPaint, FillRect, GetClientRect};
+    
+    let mut ps: PAINTSTRUCT = mem::uninitialized();
+    const EDGE_RAISED: UINT = 0x0002 | 0x0004;
+    const BF_RECT: UINT = 0x0001 | 0x0002 | 0x0004 | 0x0008 | 0x4000;
 
     let handled = match msg {
         WM_CREATE => true,
         WM_PAINT => {
-            false
+            let hdc = BeginPaint(hwnd, &mut ps); 
+            let mut rect: RECT = mem::zeroed();
+            GetClientRect(hwnd, &mut rect);
+            FillRect(hdc, &ps.rcPaint, mem::transmute(COLOR_WINDOW as usize));
+            DrawEdge(hdc, &mut rect, EDGE_RAISED, BF_RECT);
+            EndPaint(hwnd, &ps); 
+            true
         },
         _ => false
     };
@@ -145,13 +156,19 @@ unsafe fn build_sysclass() -> Result<(), Error> {
 }
 
 #[inline(always)]
-unsafe fn build_window<ID: Hash+Clone, S: Clone+Into<String>>(t: &GroupBoxT<ID, S>) -> Result<HWND, Error> {
-    use low::window_helper::{WindowParams, build_window};
-    use winapi::{DWORD, WS_VISIBLE, WS_DISABLED};
+unsafe fn build_window<ID: Hash+Clone, S: Clone+Into<String>>(ui: &Ui<ID>, t: &GroupBoxT<ID, S>) -> Result<HWND, Error> {
+    use low::window_helper::{WindowParams, build_window, handle_of_window};
+    use winapi::{DWORD, WS_VISIBLE, WS_DISABLED, WS_CHILD};
 
-    let flags: DWORD = 
+    let flags: DWORD = WS_CHILD | 
     if t.visible    { WS_VISIBLE }   else { 0 } |
     if t.disabled   { WS_DISABLED }  else { 0 };
+
+    // Get the parent handle
+    let parent = match handle_of_window(ui, &t.parent, "The parent of a groupbox must be a window-like control.") {
+        Ok(h) => h,
+        Err(e) => { return Err(e); }
+    };
 
     let params = WindowParams {
         title: "",
@@ -160,11 +177,48 @@ unsafe fn build_window<ID: Hash+Clone, S: Clone+Into<String>>(t: &GroupBoxT<ID, 
         size: t.size.clone(),
         flags: flags,
         ex_flags: None,
-        parent: ::std::ptr::null_mut()
+        parent: parent
     };
 
     match build_window(params) {
-        Ok(h) => Ok(h),
+        Ok(h) => {
+            add_label_children(ui, t, h)?;
+            Ok(h)
+        },
+        Err(e) => Err(Error::System(e))
+    }
+}
+
+#[inline(always)]
+unsafe fn add_label_children<ID: Hash+Clone, S: Clone+Into<String>>(ui: &Ui<ID>, t: &GroupBoxT<ID, S>, handle: HWND) -> Result<(), Error> {
+    use low::window_helper::{WindowParams, build_window, handle_of_font, set_window_font_raw};
+    use low::defs::{SS_NOTIFY, SS_NOPREFIX, SS_CENTER};
+    use winapi::{WS_CHILD, WS_VISIBLE, HFONT};
+
+     let params = WindowParams {
+        title: t.text.clone().into(),
+        class_name: "STATIC",
+        position: (0,0),
+        size: (0, 0),
+        flags: WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_NOPREFIX | SS_CENTER,
+        ex_flags: Some(0),
+        parent: handle
+    };
+
+    let font_handle: Option<HFONT> = match t.font.as_ref() {
+        Some(font_id) => 
+            match handle_of_font(ui, &font_id, "The font of a label must be a font resource.") {
+                Ok(h) => Some(h),
+                Err(e) => { return Err(e); }
+            },
+        None => None
+    };
+
+    match build_window(params) {
+        Ok(h) => {
+            set_window_font_raw(h, font_handle, true);
+            Ok(())
+        },
         Err(e) => Err(Error::System(e))
     }
 }

@@ -81,6 +81,9 @@ cargo run --example simple_canvas --features=canvas
 
 #[macro_use] extern crate native_windows_gui as nwg;
 
+//To hide console window
+#![windows_subsystem = "windows"]
+
 use nwg::{Ui, simple_message, fatal_message, dispatch_events};
 use nwg::events as nwge;
 

@@ -213,9 +213,6 @@ unsafe fn create_dib(i: &MemoryImageT) -> Result<HBITMAP, Error> {
     let iheader_ptr: *const BITMAPINFOHEADER = mem::transmute(src.offset(fheader_size as isize));
     let iheader: BITMAPINFOHEADER = ptr::read( iheader_ptr );
 
-    println!("{:?}", fheader);
-    println!("In BI header: {:?}", iheader);
-
     let (w, h) = (iheader.biWidth, iheader.biHeight);
 
     let screen_dc = GetDC(ptr::null_mut());
@@ -231,7 +228,6 @@ unsafe fn create_dib(i: &MemoryImageT) -> Result<HBITMAP, Error> {
         biXPelsPerMeter: 0, biYPelsPerMeter: 0,
         biClrUsed: 0, biClrImportant: 0
     };
-    println!("Created BI header: {:?}", header);
 
     let info = BITMAPINFO {
         bmiHeader: header,

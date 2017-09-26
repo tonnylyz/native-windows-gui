@@ -61,8 +61,8 @@ For more information also see:
     * `set_position`: Set the cursor position in the screen
     * `get`: Set the cursor look (using a Cursor Image resource)
     * `set`: Get the cursor resource identifier (using a Cursor Image resource)
-    * `get_capture`: Capture the mouse for a control
-    * `set_capture`: Get the identifier of the control that captures the mouse
+    * `get_capture`: Get the identifier of the control that captures the mouse
+    * `set_capture`: Capture the mouse for a control 
     * `release`: Release the mouse capture set with `set_capture`
     * `dragging`: Check if the user tries to drag a control. Mostly used with a `set_capture`/`release` pair   
 
