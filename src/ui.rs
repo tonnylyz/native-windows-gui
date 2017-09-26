@@ -258,7 +258,7 @@ impl<ID: Hash+Clone> UiInner<ID> {
 
         // Get the callback list for the requested event
         let mut callbacks = {
-            let mut cb = events_collection.unwrap();
+            let cb = events_collection.unwrap();
             if cb.contains_key(&event) {
                 cb.get_mut(&event).unwrap()
             } else {
@@ -281,7 +281,7 @@ impl<ID: Hash+Clone> UiInner<ID> {
 
         // Update the event definitions of the ui
         let push_event = |id: u32, defs: &mut EventDefinitionsCollection| {
-            if let Some(mut event_vec) = defs.get_mut(&id) {
+            if let Some(event_vec) = defs.get_mut(&id) {
                 match Rc::get_mut(event_vec) {
                     Some(ev) => {
                         if ev.iter().any(|&e| e == event) { return }

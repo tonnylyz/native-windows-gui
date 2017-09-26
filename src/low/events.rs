@@ -157,47 +157,71 @@ pub const MouseDown: Event = Event::Group(&[WM_LBUTTONDOWN, WM_RBUTTONDOWN, WM_M
 pub const MouseMove: Event = Event::Single(WM_MOUSEMOVE, &unpack_mousemove, &hwnd_handle);
 
 // Button events
-pub const BtnClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,BN_CLICKED) });
-pub const BtnDoubleClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,BN_DBLCLK) });
-pub const BtnFocus: Event = Event::Single(WM_COMMAND, &unpack_btn_focus, &|h,m,w,l|{ command_2_handle(h,m,w,l,BN_SETFOCUS,BN_KILLFOCUS) });
+fn h1(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,BN_CLICKED) }
+fn h2(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,BN_DBLCLK) }
+fn h3(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_2_handle(h,m,w,l,BN_SETFOCUS,BN_KILLFOCUS) }
+pub const BtnClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h1);
+pub const BtnDoubleClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h2);
+pub const BtnFocus: Event = Event::Single(WM_COMMAND, &unpack_btn_focus, &h3);
 
 // Combobox events
-pub const CbnFocus: Event = Event::Single(WM_COMMAND, &unpack_cbn_focus, &|h,m,w,l|{ command_2_handle(h,m,w,l,CBN_SETFOCUS,CBN_KILLFOCUS) });
-pub const CbnSelectionChanged: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,CBN_SELCHANGE) });
+fn h4(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_2_handle(h,m,w,l,CBN_SETFOCUS,CBN_KILLFOCUS) }
+fn h5(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,CBN_SELCHANGE) }
+pub const CbnFocus: Event = Event::Single(WM_COMMAND, &unpack_cbn_focus, &h4);
+pub const CbnSelectionChanged: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h5);
 
 // Static events
-pub const StnClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,STN_CLICKED) });
-pub const StnDoubleClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,STN_DBLCLK) });
+fn h6(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,STN_CLICKED) }
+fn h7(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,STN_DBLCLK) }
+pub const StnClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h6);
+pub const StnDoubleClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h7);
 
 // Datepicker events
-pub const DateChanged: Event = Event::Single(WM_NOTIFY, &event_unpack_no_args, &|h,m,w,l|{ notify_handle(h,m,w,l, DTN_CLOSEUP) });
+fn h8(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, DTN_CLOSEUP) }
+pub const DateChanged: Event = Event::Single(WM_NOTIFY, &event_unpack_no_args, &h8);
 
 // Listbox events
-pub const LbnSelectionChanged: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,LBN_SELCHANGE) });
-pub const LbnDoubleClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,LBN_DBLCLK) });
-pub const LbnFocus: Event = Event::Single(WM_COMMAND, &unpack_lbn_focus, &|h,m,w,l|{ command_2_handle(h,m,w,l,LBN_SETFOCUS,LBN_KILLFOCUS) });
+fn h9(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,LBN_SELCHANGE) }
+fn h10(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,LBN_DBLCLK) }
+fn h11(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_2_handle(h,m,w,l,LBN_SETFOCUS,LBN_KILLFOCUS) }
+pub const LbnSelectionChanged: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h9);
+pub const LbnDoubleClick: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h10);
+pub const LbnFocus: Event = Event::Single(WM_COMMAND, &unpack_lbn_focus, &h11);
 
 // Textedit events
-pub const EnValueChanged: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,EN_UPDATE) });
-pub const EnLimit: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &|h,m,w,l|{ command_handle(h,m,w,l,EN_MAXTEXT) });
-pub const EnFocus: Event = Event::Single(WM_COMMAND, &unpack_en_focus, &|h,m,w,l|{ command_2_handle(h,m,w,l,EN_SETFOCUS,EN_KILLFOCUS) });
+fn h12(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,EN_UPDATE) }
+fn h13(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_handle(h,m,w,l,EN_MAXTEXT) }
+fn h14(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { command_2_handle(h,m,w,l,EN_SETFOCUS,EN_KILLFOCUS) }
+pub const EnValueChanged: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h12);
+pub const EnLimit: Event = Event::Single(WM_COMMAND, &event_unpack_no_args, &h13);
+pub const EnFocus: Event = Event::Single(WM_COMMAND, &unpack_en_focus, &h14);
 
 // Timer events
-pub const TimerTick: Event = Event::Single(WM_TIMER, &event_unpack_no_args, &|h,m,w,l|{ Some( AnyHandle::Custom(any::TypeId::of::<Timer>(), w as usize) ) });
+fn h15(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { Some( AnyHandle::Custom(any::TypeId::of::<Timer>(), w as usize) )  }
+pub const TimerTick: Event = Event::Single(WM_TIMER, &event_unpack_no_args, &h15);
 
 // Menu item events
 pub const MenuTrigger: Event = Event::Single(WM_MENUCOMMAND, &event_unpack_no_args, &menuitem_handle);
 
 // TreeView events
-pub const TreeViewSelectionChanged: Event = Event::Single(WM_NOTIFY, &event_unpack_no_args, &|h,m,w,l|{ notify_handle(h,m,w,l, TVN_SELCHANGEDW) });
-pub const TreeViewClick: Event = Event::Single(WM_NOTIFY, &event_unpack_no_args, &|h,m,w,l|{ notify_handle(h,m,w,l, NM_CLICK) });
-pub const TreeViewDoubleClick: Event = Event::Single(WM_NOTIFY, &event_unpack_no_args, &|h,m,w,l|{ notify_handle(h,m,w,l, NM_DBLCLK) });
-pub const TreeViewFocus: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &|h,m,w,l|{ notify_2_handle(h,m,w,l, NM_KILLFOCUS, NM_SETFOCUS) });
-pub const TreeViewDeleteItem: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &|h,m,w,l|{ notify_handle(h,m,w,l, TVN_DELETEITEMW) });
-pub const TreeViewItemChanged: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &|h,m,w,l|{ notify_handle(h,m,w,l, TVN_ITEMCHANGEDW) });
-pub const TreeViewItemChanging: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &|h,m,w,l|{ notify_handle(h,m,w,l, TVN_ITEMCHANGINGW) });
-pub const TreeViewItemExpanded: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &|h,m,w,l|{ notify_handle(h,m,w,l, TVN_ITEMEXPANDEDW) });
-pub const TreeViewItemExpanding: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &|h,m,w,l|{ notify_handle(h,m,w,l, TVN_ITEMEXPANDINGW) });
+fn h16(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, TVN_SELCHANGEDW) }
+fn h17(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, NM_CLICK) }
+fn h18(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, NM_DBLCLK) }
+fn h19(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_2_handle(h,m,w,l, NM_KILLFOCUS, NM_SETFOCUS) }
+fn h20(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, TVN_DELETEITEMW) }
+fn h21(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, TVN_ITEMCHANGEDW) }
+fn h22(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, TVN_ITEMCHANGINGW) }
+fn h23(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, TVN_ITEMEXPANDEDW) }
+fn h24(h:HWND,m:UINT,w:WPARAM,l:LPARAM) -> Option<AnyHandle> { notify_handle(h,m,w,l, TVN_ITEMEXPANDINGW) }
+pub const TreeViewSelectionChanged: Event = Event::Single(WM_NOTIFY, &event_unpack_no_args, &h16);
+pub const TreeViewClick: Event = Event::Single(WM_NOTIFY, &event_unpack_no_args, &h17);
+pub const TreeViewDoubleClick: Event = Event::Single(WM_NOTIFY, &event_unpack_no_args, &h18);
+pub const TreeViewFocus: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &h19);
+pub const TreeViewDeleteItem: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &h20);
+pub const TreeViewItemChanged: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &h21);
+pub const TreeViewItemChanging: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &h22);
+pub const TreeViewItemExpanded: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &h23);
+pub const TreeViewItemExpanding: Event = Event::Single(WM_NOTIFY, &unpack_tree_focus, &h24);
 
 // Event unpackers for the events defined above
 fn unpack_move(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> Option<EventArgs> {
