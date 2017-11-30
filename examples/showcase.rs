@@ -27,15 +27,6 @@ nwg_template!(
         ("QuitItem", nwg_menuitem!(parent="FileMenu"; text="&Quit")),
         ("WindowAction", nwg_menuitem!(parent="MainWindow"; text="&Action")),
 
-        // Context Menu
-        ("Context", nwg_contextmenu!()),
-        ("Action1", nwg_menuitem!(parent="Context"; text="Action 1")),
-        ("Action2", nwg_menuitem!(parent="Context"; text="Action 2")),
-        ("S2", nwg_separator!(parent="Context")),
-        ("TestSubmenu3", nwg_menu!(parent="Context"; text="&Submenu")),
-        ("Action3", nwg_menuitem!(parent="TestSubmenu3"; text="SayHello")),
-        ("Action4", nwg_menuitem!(parent="TestSubmenu3"; text="Disabled :("; disabled=true)),
-        
         // Tabs
         ("TabView", nwg_tabsview!(parent="MainWindow"; position=(5, 5); size=(490, 370); font=Some("Font1"))),
         ("Tab1", nwg_tab!(parent="TabView"; text="Simple controls")),
@@ -93,6 +84,17 @@ nwg_template!(
         ("RustLogoFrame", nwg_image_frame!(parent="Tab2"; image=Some("RustLogo"); position=(190, 215); size=(100,100))),
         ("OtherFrame", nwg_image_frame!(parent="Tab2"; image=Some("RustLogoMemory"); position=(295, 215); size=(100,100))),
         
+        // ContextMenu
+        ("ContextFrame", nwg_frame!(parent="Tab2"; position=(190, 35); size=(280, 100) )),
+        ("ContextLabel", nwg_label!(parent="ContextFrame"; text="This frame has a context menu!"; position=(5, 42); size=(270, 15); align=HTextAlign::Center)),
+        ("Context", nwg_contextmenu!()),
+        ("Action1", nwg_menuitem!(parent="Context"; text="Action 1")),
+        ("Action2", nwg_menuitem!(parent="Context"; text="Action 2")),
+        ("S2", nwg_separator!(parent="Context")),
+        ("TestSubmenu3", nwg_menu!(parent="Context"; text="&Submenu")),
+        ("Action3", nwg_menuitem!(parent="TestSubmenu3"; text="SayHello")),
+        ("Action4", nwg_menuitem!(parent="TestSubmenu3"; text="Disabled :("; disabled=true)),
+
         // TreeView
         ("TreeSelected", nwg_textinput!(parent="Tab2"; position=(190, 5); size=(280, 22); placeholder=Some("Selected Item Text"); font=Some("Font1") )),
         ("TreeView", nwg_treeview!(parent="Tab2"; position=(5, 5); size=(180, 315))),
@@ -175,7 +177,7 @@ nwg_template!(
             }
         }),
 
-        ("MainWindow", "context", nwge::MouseDown, |app, _, _, args| {
+        ("ContextFrame", "context", nwge::MouseDown, |app, _, _, args| {
             match args {
                 &EventArgs::MouseClick{ref btn, pos: _} => {
                     if let nwg::constants::MouseButton::Right = *btn {
