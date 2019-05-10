@@ -183,7 +183,6 @@ pub struct MENUINFO {
 
 #[repr(packed)]
 #[allow(non_snake_case)]
-#[derive(Debug)]
 pub struct BITMAPFILEHEADER {
     pub bfType: WORD,
     pub bfSize: DWORD,

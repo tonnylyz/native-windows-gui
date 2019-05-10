@@ -400,7 +400,6 @@ unsafe fn build_separator<ID: Clone+Hash>(ui: &Ui<ID>, t: &SeparatorT<ID>) -> Re
     use user32::AppendMenuW;
     use winapi::MENUITEMINFOW;
     use low::defs::{MF_SEPARATOR, SetMenuItemInfoW, GetMenuItemCount, MIIM_ID};
-    use std::ptr;
     
     let ph_result = ui.handle_of(&t.parent);
     if ph_result.is_err() { return Err(ph_result.err().unwrap()); }

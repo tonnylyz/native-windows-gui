@@ -108,7 +108,7 @@ use winapi::{UINT, WPARAM, LPARAM, LRESULT};
 
 #[allow(unused_variables)]
 unsafe extern "system" fn window_sysproc(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> LRESULT {
-    use winapi::{UINT, WM_CREATE, WM_PAINT, PAINTSTRUCT, RECT, COLOR_WINDOW};
+    use winapi::{WM_CREATE, WM_PAINT, PAINTSTRUCT, RECT, COLOR_WINDOW};
     use user32::{DefWindowProcW, DrawEdge, BeginPaint, EndPaint, FillRect, GetClientRect};
     use std::mem;
 

@@ -188,7 +188,7 @@ pub unsafe fn build_window<S1: Into<String>, S2: Into<String>>(p: WindowParams<S
     Resize the client area to match the "true" size. 
 */
 unsafe fn fix_overlapped_window_size(handle: HWND, size: (u32, u32)) {
-    use winapi::{RECT, SWP_NOMOVE, SWP_NOZORDER, c_int};
+    use winapi::{RECT, SWP_NOMOVE, SWP_NOZORDER};
     use user32::{GetClientRect, SetWindowPos};
 
     let mut rect: RECT = mem::uninitialized();
@@ -233,7 +233,7 @@ pub unsafe fn list_window_children(handle: HWND) -> Vec<AnyHandle> {
 
 /// Set the font of a window
 pub unsafe fn set_window_font_raw(handle: HWND, font_handle: Option<HFONT>, redraw: bool) {
-    use winapi::{WM_SETFONT, LPARAM};
+    use winapi::{WM_SETFONT};
 
     let font_handle = font_handle.unwrap_or(ptr::null_mut());
 
@@ -303,7 +303,6 @@ pub unsafe fn get_window_text(handle: HWND) -> String {
 #[inline(always)]
 pub unsafe fn set_window_text<'a>(handle: HWND, text: &'a str) {
     use user32::SetWindowTextW;
-    use low::other_helper::to_utf16;
 
     let text = to_utf16(text);
     SetWindowTextW(handle, text.as_ptr());
@@ -314,7 +313,7 @@ pub unsafe fn set_window_text<'a>(handle: HWND, text: &'a str) {
 #[inline(always)]
 pub unsafe fn set_window_position(handle: HWND, x: i32, y: i32) {
     use user32::SetWindowPos;
-    use winapi::{c_int, SWP_NOZORDER, SWP_NOSIZE, SWP_NOACTIVATE};
+    use winapi::{SWP_NOZORDER, SWP_NOSIZE, SWP_NOACTIVATE};
 
     SetWindowPos(handle, ptr::null_mut(), x as c_int, y as c_int, 0, 0, SWP_NOZORDER|SWP_NOSIZE|SWP_NOACTIVATE);
 }
@@ -342,7 +341,7 @@ pub unsafe fn get_window_position(handle: HWND) -> (i32, i32) {
 #[inline(always)]
 pub unsafe fn set_window_size(handle: HWND, w: u32, h: u32, fix: bool) {
     use user32::{SetWindowPos};
-    use winapi::{c_int, SWP_NOZORDER, SWP_NOMOVE, SWP_NOACTIVATE, SWP_NOCOPYBITS};
+    use winapi::{SWP_NOZORDER, SWP_NOMOVE, SWP_NOACTIVATE, SWP_NOCOPYBITS};
 
     SetWindowPos(handle, ptr::null_mut(), 0, 0, w as c_int, h as c_int, SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE|SWP_NOCOPYBITS);
 

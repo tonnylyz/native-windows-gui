@@ -434,7 +434,6 @@ unsafe fn unhook_view(handle: HWND) {
 unsafe fn resize_tabview_children(view: HWND) {
     use low::window_helper::get_window_size;
     use user32::EnumChildWindows;
-    use std::mem;
 
     let (w, h) = get_window_size(view);
     let mut data: (HWND, u32, u32) = (view, w, h);

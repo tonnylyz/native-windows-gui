@@ -225,7 +225,7 @@ pub const TreeViewItemExpanding: Event = Event::Single(WM_NOTIFY, &unpack_tree_f
 
 // Event unpackers for the events defined above
 fn unpack_move(hwnd: HWND, msg: UINT, w: WPARAM, l: LPARAM) -> Option<EventArgs> {
-    use winapi::{LOWORD, HIWORD};
+    use winapi::{LOWORD};
     
     let (x, y) = (LOWORD(l as u32), HIWORD(l as u32));
     Some(EventArgs::Position(x as i32, y as i32))
@@ -363,7 +363,7 @@ pub fn hook_window_events<ID: Hash+Clone+'static>(uiinner: &mut UiInner<ID>, han
 */
 pub fn unhook_window_events<ID: Hash+Clone+'static>(handle: HWND) { unsafe {
   use comctl32::RemoveWindowSubclass;
-  use winapi::{TRUE, DWORD_PTR};
+  use winapi::{TRUE};
 
   let mut data: DWORD_PTR = 0;
   if get_window_subclass(handle, Some(process_events::<ID>), EVENTS_DISPATCH_ID, &mut data) == TRUE {

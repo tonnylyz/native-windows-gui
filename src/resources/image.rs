@@ -173,7 +173,6 @@ impl Resource for Image {
     fn free(&mut self) {
         use gdi32::DeleteObject;
         use user32::{DestroyCursor, DestroyIcon};
-        use std::mem;
 
         unsafe{
             match self.image_type {
