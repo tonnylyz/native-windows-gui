@@ -27,21 +27,22 @@ use ui::Ui;
 use controls::{Control, ControlT, ControlType, AnyHandle};
 use error::Error;
 use events::Event;
+use std::ffi::OsStr;
 
 /**
     A template that creates a standard button
 
-    Available events:  
-    Event::Destroyed, Event::Click, Event::DoubleClick, Event::Focus, Event::Moved, Event::Resized, Event::Raw  
+    Available events:
+    Event::Destroyed, Event::Click, Event::DoubleClick, Event::Focus, Event::Moved, Event::Resized, Event::Raw
 
-    Members:  
-    • `text`: The text of the button  
-    • `position`: The start position of the button  
-    • `size`: The start size of the button  
-    • `visible`: If the button should be visible to the user   
-    • `disabled`: If the user can or can't click on the button  
-    • `parent`: The button parent  
-    • `font`: The button font. If None, use the system default  
+    Members:
+    • `text`: The text of the button
+    • `position`: The start position of the button
+    • `size`: The start size of the button
+    • `visible`: If the button should be visible to the user
+    • `disabled`: If the user can or can't click on the button
+    • `parent`: The button parent
+    • `font`: The button font. If None, use the system default
 */
 #[derive(Clone)]
 pub struct ButtonT<S: Clone+Into<String>, ID: Hash+Clone> {
@@ -63,9 +64,9 @@ impl<S: Clone+Into<String>, ID: Hash+Clone> ControlT<ID> for ButtonT<S, ID> {
 
     fn build(&self, ui: &Ui<ID>) -> Result<Box<Control>, Error> {
         use low::window_helper::{WindowParams, build_window, set_window_font, handle_of_window, handle_of_font};
-        use winapi::{DWORD, WS_VISIBLE, WS_DISABLED, WS_CHILD, BS_NOTIFY, BS_TEXT};
+        use winapi::{DWORD, WS_VISIBLE, WS_DISABLED, WS_CHILD, BS_NOTIFY, BS_TEXT, BS_BITMAP, LR_DEFAULTCOLOR, LR_DEFAULTSIZE, LR_LOADFROMFILE, IMAGE_BITMAP};
 
-        let flags: DWORD = WS_CHILD | BS_NOTIFY | BS_TEXT |
+        let flags: DWORD = WS_CHILD | BS_NOTIFY | BS_BITMAP |
         if self.visible    { WS_VISIBLE }   else { 0 } |
         if self.disabled   { WS_DISABLED }  else { 0 };
 
@@ -77,7 +78,7 @@ impl<S: Clone+Into<String>, ID: Hash+Clone> ControlT<ID> for ButtonT<S, ID> {
 
         // Get the font handle (if any)
         let font_handle: Option<HFONT> = match self.font.as_ref() {
-            Some(font_id) => 
+            Some(font_id) =>
                 match handle_of_font(ui, &font_id, "The font of a button must be a font resource.") {
                     Ok(h) => Some(h),
                     Err(e) => { return Err(e); }
@@ -97,6 +98,22 @@ impl<S: Clone+Into<String>, ID: Hash+Clone> ControlT<ID> for ButtonT<S, ID> {
 
         match unsafe{ build_window(params) } {
             Ok(h) => {
+                unsafe {
+                    use std::os::windows::ffi::OsStrExt;
+                    use user32::{LoadImageW, SendMessageW};
+                    use kernel32::GetLastError;
+                    let handle_img = LoadImageW(
+                        std::ptr::null_mut(),
+                        OsStr::new(&self.text.clone().into()).encode_wide().chain(Some(0)).collect::<Vec<_>>().as_ptr(),
+                        IMAGE_BITMAP,
+                        0,
+                        0,
+                        LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
+                    if handle_img as u64 == 0 {
+                        println!("image handle {:x} {:x}", handle_img as u64, GetLastError());
+                    }
+                    SendMessageW(h, 247/*BM_SETIMAGE*/, IMAGE_BITMAP as u64, handle_img as i64);
+                }
                 unsafe{ set_window_font(h, font_handle, true); }
                 Ok( Box::new(Button{handle: h}) )
             },
