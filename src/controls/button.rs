@@ -101,17 +101,14 @@ impl<S: Clone+Into<String>, ID: Hash+Clone> ControlT<ID> for ButtonT<S, ID> {
                 unsafe {
                     use std::os::windows::ffi::OsStrExt;
                     use user32::{LoadImageW, SendMessageW};
-                    use kernel32::GetLastError;
+                    use kernel32::{GetLastError,GetModuleHandleW};
                     let handle_img = LoadImageW(
-                        std::ptr::null_mut(),
+                        GetModuleHandleW(std::ptr::null()),
                         OsStr::new(&self.text.clone().into()).encode_wide().chain(Some(0)).collect::<Vec<_>>().as_ptr(),
                         IMAGE_BITMAP,
                         0,
                         0,
-                        LR_DEFAULTCOLOR | LR_DEFAULTSIZE | LR_LOADFROMFILE);
-                    if handle_img as u64 == 0 {
-                        println!("image handle {:x} {:x}", handle_img as u64, GetLastError());
-                    }
+                        LR_DEFAULTCOLOR | LR_DEFAULTSIZE);
                     SendMessageW(h, 247/*BM_SETIMAGE*/, IMAGE_BITMAP as u64, handle_img as i64);
                 }
                 unsafe{ set_window_font(h, font_handle, true); }
